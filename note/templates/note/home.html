@@ -1,0 +1,47 @@
+{% extends 'main.html' %}
+{% block content %}
+<style>
+    .home-container{
+        display: grid;
+        grid-template-columns: 1fr 3fr;
+    }
+    #topic{
+        border : 2px solid black;
+        text-align: center;
+        padding: 2px 3px;
+    }
+    #content{
+        padding: 2px 51px;
+    }
+</style>
+<div class = 'home-container'>
+    <div id = 'topic'>
+        <h3>Topics</h3>
+        <hr>
+        <a href="{% url 'create-topic'%}"><input type="button" value="Add Topic"></a>
+        <div>
+            <h4><a href="{% url 'home' %}">All</a></h4>
+        </div>
+        {% for topic in topic  %}
+            <div>
+                <h4><a href="{% url 'home'%}?q={{topic.name}}">{{topic.name}}</a></h4>
+            </div>    
+        {% endfor %}
+    </div>
+    <div id = 'content'>
+        <p>Available notes: {{count}}</p>
+        <a href="{% url 'create' %}"><input type="button" value="Add Note"></a>
+        <div>
+            {% for note in note  %}
+            <div>
+                <p>@ {{note.host.username}}</p>
+                <h3><a href="{% url 'note' note.id %}">{{note.name}}</a></h3>
+                <p>{{note.topic.name}}</p>
+                <hr>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock content %}
+    
