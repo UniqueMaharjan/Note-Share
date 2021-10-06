@@ -8,7 +8,9 @@
 <p>{{note.body}}</p>
 <hr>
 <h4> Note:</h4>
-<p>{{note.file_upload}}<input type="button" value="download"></p>
+{% if note.file_upload  %}
+    <p>{{note.file_upload}}<input type="button" value="download"></p>
+{% endif %}
 <hr>
 <h5>Category of: </h5>
 <h6>{{note.topic.name}}</h6>
