@@ -1,0 +1,22 @@
+{% extends 'main.html' %}
+
+{% block content %}
+<h2>{{note.name}}</h2>
+<h5>Provided by: @{{note.host.username}}</h5>
+<hr>
+<h4>Description:</h4>
+<p>{{note.body}}</p>
+<hr>
+<h4> Note:</h4>
+{% if note.file_upload  %}
+    <p>{{note.file_upload}}<input type="button" value="download"></p>
+{% endif %}
+<hr>
+<h5>Category of: </h5>
+<h6>{{note.topic.name}}</h6>
+<hr>
+{% if request.user == note.host%}
+<a href="{% url 'edit' note.id%}">Edit</a>
+<a href="{% url 'delete' note.id%}">Delete</a>
+{% endif %}
+{% endblock content %}

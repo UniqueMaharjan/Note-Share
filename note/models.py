@@ -1,7 +1,18 @@
 from django.db import models
-from django.contrib.auth.models import User
-from django.db.models.deletion import CASCADE
+from django.contrib.auth.models import AbstractUser
+
 # Create your models here.
+class User(AbstractUser):
+    name = models.CharField(max_length=200,null=True,blank=True)
+    email = models.EmailField(unique=True,null=True)
+    bio = models.TextField(null=True,blank=True)
+    avatar = models.ImageField(default = "images/avatar.svg",upload_to = "images",null = True)
+
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = []
+    def __str__(self):
+        return self.email
+
 class SubjectList(models.Model):
     name = models.CharField(max_length=200)
 
@@ -21,10 +32,9 @@ class SubjectNote(models.Model):
         ordering = ['-updated','-created']
     def __str__(self):
         return self.name
+    # @property
+    # def file_name(self):
+    #     file = self.file_upload.find('/')
+    #     filename = self.file_upload[file+1:]
+    #     return filename
 
-class UserProfile(models.Model):
-    user = models.OneToOneField(User, on_delete= models.CASCADE)
-    profile_pic = models.ImageField(upload_to = "profile")
-
-    def __str__(self):
-        return f'Profile of {self.user}'

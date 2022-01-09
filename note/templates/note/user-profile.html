@@ -1,0 +1,29 @@
+{% extends 'main.html' %} 
+{% block content %} 
+{% load static%}
+<div class="profile-pic-div">
+  <img src="{{user.avatar.url}}" id="photo" />
+  <input type="file" id="file" />
+  <label for="file" id="uploadBtn">Choose Photo</label>
+</div>
+
+<div class="about-me-container">
+  <p id="about-me-text">
+  Name: {{user.name}}
+  </p>
+  <br>
+  <p id = "about-me-text">
+    Bio: 
+    <span>{{user.bio}}</span>
+  </p>
+  
+</div>
+
+<div class = "container">
+  <div class = "download-history">
+  {%include 'note/feed_component.html'%}
+  </div>
+</div>
+
+
+{% endblock content %}

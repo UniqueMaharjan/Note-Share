@@ -1,0 +1,13 @@
+<div id = 'content'>
+
+    <div>
+        {% for note in note  %}
+        <div>
+            <p>@ {{note.host.username}}</p>
+            <h3><a href="{% url 'note' note.id %}">{{note.name}}</a></h3>
+            <p>{{note.topic.name}}</p>
+            <hr>
+        </div>
+        {% endfor %}
+        </div>
+</div>

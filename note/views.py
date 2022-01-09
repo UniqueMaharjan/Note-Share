@@ -1,26 +1,28 @@
+from django.http.response import Http404
 from django.shortcuts import render,redirect
 from django.http import HttpResponse
 from django.db.models import Q
-from django.contrib.auth.models import User
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate,login,logout
-from django.contrib.auth.forms import UserCreationForm
-from .models import SubjectNote,SubjectList
-from .forms import noteForm,listForm
+
+from .models import SubjectNote,SubjectList,User
+from .forms import noteForm,listForm,MyUserCreationForm,MyUserForm
+import os
+from django.conf import settings
 
 def login_user(request):
     page = 'login'
     if request.user.is_authenticated:
         return redirect('home')
     if request.method == "POST":
-        username = request.POST.get('username').lower()
+        email = request.POST.get('email').lower()
         password = request.POST.get('password')
         try:
-            user = User.objects.get(username=username)
+            user = User.objects.get(email = email)
         except:
             messages.error(request,'User doesnot exit!!')
-        user = authenticate(request, username = username, password = password)
+        user = authenticate(request, email = email, password = password)
     
         if user != None:
             login(request,user)
@@ -35,9 +37,11 @@ def logout_user(request):
     return redirect('home')
 
 def register_user(request):
-    form = UserCreationForm()
+    if request.user.is_authenticated:
+        return redirect('home')
+    form = MyUserCreationForm()
     if request.method == "POST":
-        form = UserCreationForm(request.POST)
+        form = MyUserCreationForm(request.POST)
         if form.is_valid():
             user = form.save(commit = False)
             user.username = user.username.lower()
@@ -45,7 +49,7 @@ def register_user(request):
             login(request,user)
             return redirect('home')
         else:
-            messages.error(request,'Error')
+            messages.error(request,'Please Checkout your passwords.... Try to implement strong one . .')
     content = {
         'form':form
     }
@@ -56,7 +60,8 @@ def home(request):
     topics = SubjectList.objects.all()
     notes = SubjectNote.objects.filter(
         Q(topic__name__icontains = q)|
-        Q(name__icontains = q)
+        Q(name__icontains = q)|
+        Q(host__username__icontains = q)
     )
     note_count = notes.count()
     content = {
@@ -77,35 +82,68 @@ def noteDetails(request,pk):
 @login_required(login_url='login')
 def addNote(request):
     form = noteForm()
+    topic = SubjectList.objects.all()
     if request.method == "POST":
-        form = noteForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('home')
-    return render(request,'note/addnote.html',{'form':form})
+        topic_name = request.POST.get('topic')
+        topic,created = SubjectList.objects.get_or_create(name = topic_name)
 
+        SubjectNote.objects.create(
+            host = request.user,
+            topic = topic,
+            name = request.POST.get('name'),
+            body = request.POST.get('body'),
+            file_upload = request.FILES.get('file_upload')
+        )
+        return redirect('home')
+    return render(request,'note/create.html',{'form':form,'topic':topic})
+
+@login_required(login_url='login')
 def editNote(request,pk):
     note = SubjectNote.objects.get(id=pk)
     form = noteForm(instance=note)
+    topic = SubjectList.objects.all()
+    if request.user != note.host:
+        return HttpResponse("You are not allowed here!!")
+    
     if request.method == "POST":
-        form = noteForm(request.POST, instance=note)
-        if form.is_valid():
-            form.save()
-            return redirect('home')
-    return render(request,'note/addnote.html',{"form":form})
+        topic_name = request.POST.get('topic')
+        topic,created = SubjectList.objects.get_or_create(name = topic_name)
+        note.name = request.POST.get('name')
+        note.topic = topic
+        note.body = request.POST.get('body')
+        note.file_upload = request.FILES.get('file_upload')
+        note.save()
+        return redirect('home')
+    return render(request,'note/create.html',{"form":form,"topic":topic})
 
+@login_required(login_url='login')
 def deleteNote(request,pk):
     note = SubjectNote.objects.get(id=pk)
     if request.method == "POST":
         note.delete()
         return redirect('home')
-    return render(request,'note/deletenote.html',{'obj':note})
+    return render(request,'note/delete.html',{'obj':note})
 
-def addTopic(request):
-    form = listForm()
+
+
+def UserProfile(request,pk):
+    user = User.objects.get(id = pk)
+    note = user.subjectnote_set.all()
+    context = {'user':user,'note':note}
+    return render(request,'note/user-profile.html',context)
+
+def updateUser(request):
+    user = User.objects.get(email = request.user.email)
+    form = MyUserForm(instance = user)
     if request.method == "POST":
-        form = listForm(request.POST)
+        form = MyUserForm(request.POST,request.FILES,instance=user)
         if form.is_valid():
             form.save()
             return redirect('home')
-    return render(request,'note/addtopic.html',{'form':form})
+    context = {'form':form,}
+    return render(request,'note/update-user.html',context)
+
+def topicsPage(request):
+    q = request.GET.get('q') if request.GET.get('q') != None else ''
+    topic = SubjectList.objects.filter(name__icontains = q)
+    return render(request,'note/topics.html',{'topics':topic})

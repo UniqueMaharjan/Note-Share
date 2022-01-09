@@ -1,0 +1,20 @@
+<div class="topics">
+  <div class="topics__header">
+    <h2>Topics</h2>
+  </div>
+  <ul class="topics__list">
+    <li>
+      <a href="{% url 'home' %}" class="active"
+        >All <span>{{topic.count}}</span></a
+      >
+    </li>
+    {% for topic in topic %}
+    <li>
+      <a href="{% url 'home'%}?q={{topic.name}}"
+        >{{topic.name}} <span>{{topic.subjectnote_set.all.count}}</span></a
+      >
+    </li>
+    {% endfor %}
+  </ul>
+  <!--  -->
+</div>

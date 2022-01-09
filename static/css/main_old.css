@@ -1,0 +1,17 @@
+.home-container{
+    display: grid;
+    grid-template-columns: 1fr 3fr;
+}
+#topic{
+    border : 2px solid black;
+    text-align: center;
+    padding: 2px 3px;
+}
+#content{
+    padding: 2px 51px;
+}
+.searchnote{
+    display: inline-block;
+    width: 100%;
+    margin: auto;
+}
