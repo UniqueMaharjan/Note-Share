@@ -5,8 +5,8 @@ This is a note sharing web application created using Django as a Backend. Here U
 ### Installation With Docker
 
 ```
-git clone https://github.com/ASACHIT/Pics-Extractor.git
-cd Pics-Extractor/
+git clone https://github.com/UniqueMaharjan/Note-Share
+cd Note-Share/
 docker-compose up --build
 ```
 
