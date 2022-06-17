@@ -1,10 +1,17 @@
-
 # Note Share Application
 
 This is a note sharing web application created using Django as a Backend. Here User can share notes of specific subject and download it. I have added some features like login, logout, registering as new user and Searching.
 
+### Installation With Docker
+
+```
+git clone https://github.com/ASACHIT/Pics-Extractor.git
+cd Pics-Extractor/
+docker-compose up --build
+```
 
 ## Screenshots
+
 Home Page:
 ![home](https://user-images.githubusercontent.com/87868179/148681168-d069acdd-193f-45d6-84ae-9e71d6a02ead.PNG)
 Login Page:
