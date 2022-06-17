@@ -43,11 +43,9 @@ def register_user(request):
     if request.method == "POST":
         form = MyUserCreationForm(request.POST)
         if form.is_valid():
-            user = form.save(commit=False)
-            user.username = user.username.lower()
-            user.save()
-            login(request, user)
-            return redirect("home")
+            form.cleaned_data.pop("confirm_password")
+            User.objects.create(**form.cleaned_data)
+            return redirect("login")
         else:
             messages.error(
                 request,
@@ -61,9 +59,7 @@ def home(request):
     q = request.GET.get("q") if request.GET.get("q") != None else ""
     topics = SubjectList.objects.all()
     notes = SubjectNote.objects.filter(
-        Q(topic__name__icontains=q)
-        | Q(name__icontains=q)
-        | Q(host__username__icontains=q)
+        Q(topic__name__icontains=q) | Q(name__icontains=q) | Q(host__email__icontains=q)
     )
     note_count = notes.count()
     content = {
